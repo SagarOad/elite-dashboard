@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model PersonalInfo {
+  id         String     @default(cuid()) @id
+  fullName   String
+  dob        DateTime   @map("date_of_birth")
+  cnic       String     @unique
+  occupation String
+  email      String     @unique
+  mobile     String
+  createdAt  DateTime   @default(now()) @map(name: "created_at")
+  updatedAt  DateTime   @updatedAt @map(name: "updated_at")
+  income     Income[]
+  questions  Question[] // Add this line to create the opposite relation
+}
+
+model Income {
+  id                    String   @default(cuid()) @id
+  salaryCheck           Boolean  @default(false)
+  businessCheck         Boolean  @default(false)
+  freelancerCheck       Boolean  @default(false)
+  professionalCheck     Boolean  @default(false)
+  pensionCheck          Boolean  @default(false)
+  agriculturalCheck     Boolean  @default(false)
+  commissionCheck       Boolean  @default(false)
+  aopCheck              Boolean  @default(false)
+  propertyCheck         Boolean  @default(false)
+  profitOnSavingsCheck  Boolean  @default(false)
+  investmentCheck       Boolean  @default(false)
+  otherCheck            Boolean  @default(false)
+  personalInfo          PersonalInfo? @relation(fields: [personalInfoId], references: [id])
+  personalInfoId        String   @unique
+  createdAt             DateTime @default(now()) @map(name: "created_at")
+  updatedAt             DateTime @updatedAt @map(name: "updated_at")
+}
+
+model Question {
+  id            String        @default(cuid()) @id
+  questionId    Int
+  questionName  String
+  categoryId    Int
+  personalInfo  PersonalInfo  @relation(fields: [personalInfoId], references: [id])
+  personalInfoId String
+  createdAt     DateTime      @default(now()) @map(name: "created_at")
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+}
+
+model Option {
+  id       String   @default(cuid()) @id
+  name     String
+  key      String   @unique
+  category Int
+}
